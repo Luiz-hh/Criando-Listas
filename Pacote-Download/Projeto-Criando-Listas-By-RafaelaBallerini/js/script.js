@@ -1,33 +1,82 @@
+let tarefas = []
+
 function adicionarTarefa() {
-  //Cria um input para escrever a tarefa.
-  const inputTarefa = document.getElementById("inputTarefa");
-  let tarefa = inputTarefa.value.trim();
+    const inputTarefa = document.getElementById("inputTarefa")
+    let tarefa = inputTarefa.value.trim()
+    const mensagem = document.getElementById("mensagem")
 
-  //Variável que aparecerá quando uma tarefa for adicionada.
-  const mensagem = document.getElementById("mensagem");
+    if (tarefa === "") {
+        mensagem.textContent = "Digite uma tarefa para adicioná-la à sua lista!"
+    } else {
+        mensagem.textContent = "Tarefa adicionada com sucesso!"
+        tarefas.push(tarefa)
+        renderizarTarefas()
+    }
 
-  //Verifica se foi escrita uma tarefa válida.
-  if (tarefa === "") {
-    //Mostre uma mensagem de erro.
-    let mensagemErro = "Nenhuma tarefa foi adicionada!";
-    mensagem.style.color = "#A34743";
-    mensagem.textContent = mensagemErro;
-  } else {
-    //Mostre uma mensagem de sucesso.
-    let mensagemSucesso = "Tarefa adicionada com sucesso!";
-    mensagem.style.color = "#28A745";
-    mensagem.textContent = mensagemSucesso;
+    inputTarefa.value = ""
+}
 
-    //Cria e adiciona a tarefa em listas (li).
-    const listaTarefas = document.getElementById("listaTarefas");
-    let novaTarefa = document.createElement("li");
+function renderizarTarefas() {
+    const listaTarefas = document.getElementById("listaTarefas")
+    listaTarefas.innerHTML = ""
 
-    novaTarefa.textContent = tarefa;
+    for (let i = 0; i < tarefas.length; i++) {
+        let novaTarefa = document.createElement("li")
+        novaTarefa.textContent = tarefas[i]
 
-    //Coloca a lista (li) dentro da (ul).
-    listaTarefas.appendChild(novaTarefa);
-  }
+        let botaoRemover = document.createElement("button")
+        botaoRemover.className = "remover"
+        botaoRemover.textContent = "Remover"
+        botaoRemover.onclick = () => removerTarefa(i)
 
-  //Apaga a tarefa escrita anteriormente no input.
-  inputTarefa.value = "";
+        let botaoEditar = document.createElement("button")
+        botaoEditar.className = "editar"
+        botaoEditar.textContent = "Editar"
+        botaoEditar.onclick = () => editarTarefa(i)
+
+        novaTarefa.appendChild(botaoRemover)
+        novaTarefa.appendChild(botaoEditar)
+        listaTarefas.appendChild(novaTarefa)
+    }
+
+    atualizarBotaoRemoverTudo()
+}
+
+function atualizarBotaoRemoverTudo() {
+    let botaoRemoverTudo = document.getElementById("botaoRemoverTudo")
+
+    if (tarefas.length > 0) {
+        if (!botaoRemoverTudo) {
+            botaoRemoverTudo = document.createElement("button")
+            botaoRemoverTudo.id = "botaoRemoverTudo"
+            botaoRemoverTudo.textContent = "Remover Tudo"
+            botaoRemoverTudo.onclick = limparLista
+            document.getElementById("apagarTudo").appendChild(botaoRemoverTudo)
+        }
+    } else {
+        if (botaoRemoverTudo) {
+            botaoRemoverTudo.remove()
+        }
+    }
+}
+
+function removerTarefa(i) {
+    tarefas.splice(i, 1)
+    renderizarTarefas()
+    atualizarBotaoRemoverTudo() // Garante que o botão suma ao remover a última tarefa
+}
+
+function editarTarefa(i) {
+    let tarefaEditada = prompt("Edite a tarefa:")
+    if (tarefaEditada && tarefaEditada.trim() !== "") {
+        tarefas[i] = tarefaEditada.trim()
+        renderizarTarefas()
+    }
+}
+
+function limparLista() {
+    tarefas = []
+    renderizarTarefas()
+    document.getElementById("mensagem").textContent = "Lista de tarefas limpa com sucesso"
+    atualizarBotaoRemoverTudo() // Garante que o botão suma ao remover tudo
 }
